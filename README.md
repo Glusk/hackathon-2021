@@ -5,10 +5,10 @@
 1. Download [Node.js](https://nodejs.org/en/download/).
 
 2. Go to root folder of repo (where `package.json` file is present) and install required NPM packages with:
+   ```bash
+   npm install
+   ```
 
-```bash
-npm install
-```
 ## Running the server
 
 Open shell in root folder and run:
