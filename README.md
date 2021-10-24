@@ -4,9 +4,9 @@
 
 1. Download [Node.js](https://nodejs.org/en/download/).
 
-2. Go to root folder of repo (where `package.json` file is present) and install required NPM packages with:
+2. Go to root folder of repo (where `package.json` file is present) and run:
    ```bash
-   npm install
+   npm ci
    ```
 
 ## Running the server
