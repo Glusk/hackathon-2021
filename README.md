@@ -35,9 +35,9 @@ Another approach can be used if you like.
 
 ### Server
 
-1. Server accepts client connections and upgrades them to websocket protocol.
+1. Server accepts client connections and upgrades them to websocket connections.
 2. It responds to various OCPP messages.
-3. Occasionally, it sends a PING / PONG to determine which clients are still alive.
+3. Occasionally, it sends a PING to determine which clients are still alive.
 
 ### Client
 
