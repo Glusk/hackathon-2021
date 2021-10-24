@@ -61,33 +61,3 @@ Another approach can be used if you like.
 3. **HEARTBEAT_INT_MS** interval in which we check client if its still connected
 4. **LOG_PAYLOAD**  verbose logging of data exchange between client and server
 5. **LOG_LIFECYCLE** = log lifecyle events (connect, reconnect, pingpong)
-
-# Debugging
-
-## Manually start server
-
-```bash
-node ocpp-central-cystem-server.js
-```
-
-## Manually start client 
-```bash
-node ocpp-chargepoint-client.js
-```
-## Debug with debugger
-
-1. Install extension for debugging in chrome browser
-
-Node.js V8 --inspector Manager (NiM]
-
-2. Start NiM extension in Chrome:
-
-Open <about://inspect> in a new tab 
-
-3. Start node script with inspect enabled. 
-
-```bash
-node --inspect-brk ocpp-chargepoint-client.js
-```
-
-4. After a few seconds you should see Target upgradeServer.js on your chrome tab. Click on inspect link and new DevTools window will appear with source code.
