@@ -1,8 +1,6 @@
-"use strict";
-
 const WebSocket = require("ws");
-const UTILS = require("./utils.js");
 const moment = require("moment");
+const UTILS = require("./utils.js");
 
 // Connection settings
 const OPENING_HANDSHAKE_TIMEOUT_MS = 120 * 1000; // wait time for protocol upgrade call
@@ -15,16 +13,20 @@ const CS_HOST = process.env.CS_HOST ? process.env.CS_HOST : "localhost"; // cent
 const CS_PORT = process.env.CS_PORT ? process.env.CS_PORT : 8080; // port
 const CONCURRENCY_LEVEL = process.env.CONCURRENCY_LEVEL
   ? process.env.CONCURRENCY_LEVEL
-  : 2; // one client by default
+  : 1; // one client by default
 
 const LOG_PAYLOAD = process.env.LOG_PAYLOAD ? process.env.LOG_PAYLOAD : false; // data exchange verbose logging
 const LOG_LIFECYCLE = process.env.LOG_LIFECYCLE
   ? process.env.LOG_LIFECYCLE
-  : true; // lifecycle events (connect, reconnect, pingpong)
+  : true; // lifecycle events (connect, reconnect, ping/pong)
 
 // setup logging library
 UTILS.Logging.EnablePayloadLogging = LOG_PAYLOAD;
 UTILS.Logging.EnableLifecycleLogging = LOG_LIFECYCLE;
+
+let CP_ID;
+let URL;
+let wsc;
 
 function WebSocketClient(cId) {
   this.clientId = cId;
@@ -35,9 +37,8 @@ function WebSocketClient(cId) {
   this.ocppHeartBeatInterval = undefined; // interval object
 }
 
-WebSocketClient.prototype.open = function (url) {
-  var that = this;
-  debugger;
+WebSocketClient.prototype.open = function wscOpen(url) {
+  const that = this;
   this.url = url;
   this.instance = new WebSocket(URL, ["ocpp1.6"], {
     handshakeTimeout: OPENING_HANDSHAKE_TIMEOUT_MS,
@@ -49,7 +50,7 @@ WebSocketClient.prototype.open = function (url) {
   });
 
   // NOTE: we are not using ping / pong functionality on our
-  this.instance.on("ping", function () {
+  this.instance.on("ping", function wsOnPing() {
     UTILS.Fn.log(`Client ${that.clientId} received PING`);
 
     clearTimeout(this.pingTimeout);
@@ -59,21 +60,18 @@ WebSocketClient.prototype.open = function (url) {
     // Delay should be equal to the interval at which your server
     // sends out pings plus a conservative assumption of the latency.
     this.pingTimeout = setTimeout(() => {
-      debugger;
-      UTILS.Fn.log(`Client ${that.clientId} disconected from server`);
+      UTILS.Fn.log(`Client ${that.clientId} disconnected from server`);
       this.terminate();
     }, 30000 + 1000);
   });
 
-  this.instance.on("pong", function () {
+  this.instance.on("pong", () => {
     // this is issued if client sends ping
     UTILS.Fn.lifecyc("Event pong");
   });
 
-  this.instance.on("open", function open() {
-    //debugger;
-
-    let bootNotificationRequest = {
+  this.instance.on("open", function wsOnOpen() {
+    const bootNotificationRequest = {
       chargeBoxIdentity: CP_ID,
       chargeBoxSerialNumber: CP_ID,
       chargePointModel: "ETREL INCH VIRTUAL Charger vOCPP16J",
@@ -86,7 +84,7 @@ WebSocketClient.prototype.open = function (url) {
       meterType: "",
     };
 
-    let bootNotifiPayload = JSON.stringify([
+    const bootNotificationPayload = JSON.stringify([
       UTILS.OcppCallType.ClientToServer,
       that.msgId(),
       "BootNotification",
@@ -95,16 +93,13 @@ WebSocketClient.prototype.open = function (url) {
 
     UTILS.Fn.data(
       `Client ${that.clientId} sending bot notification`,
-      bootNotifiPayload
+      bootNotificationPayload
     );
 
-    // this is websocket object  (this.instance) and not our WebSocketClient prototype!!
-    this.send(bootNotifiPayload);
+    this.send(bootNotificationPayload);
   });
 
-  this.instance.on("message", function incoming(data) {
-    //debugger;
-
+  this.instance.on("message", function wsOnMessage(data) {
     UTILS.Fn.data(`Client ${that.clientId} message received`, data);
 
     let msgArr;
@@ -112,24 +107,25 @@ WebSocketClient.prototype.open = function (url) {
       msgArr = JSON.parse(data);
     } catch (e) {
       UTILS.Fn.err("Error parsing incoming json message");
-      return false;
+      return;
     }
 
     // in boot notification we receive interval for heartbeat
-    if (msgArr[0] === 3 && msgArr[2]["interval"]) {
+    if (msgArr[0] === 3 && msgArr[2].interval) {
       // boot notification response
 
       this.ocppHeartBeatIntervalMs =
         OCPP_HEARTBEAT_INTERVAL_OVERRIDE_MS != null
           ? OCPP_HEARTBEAT_INTERVAL_OVERRIDE_MS
-          : msgArr[2]["interval"] * 1000;
+          : msgArr[2].interval * 1000;
 
       UTILS.Fn.lifecyc(
-        `Client ${that.clientId} Next interval will be at: ` +
-          moment().add(this.ocppHeartBeatIntervalMs, "ms").toString()
+        `Client ${that.clientId} Next interval will be at: ${moment()
+          .add(this.ocppHeartBeatIntervalMs, "ms")
+          .toString()}`
       );
 
-      this.ocppHeartBeatInterval = setInterval(function () {
+      this.ocppHeartBeatInterval = setInterval(() => {
         that.send(
           JSON.stringify([
             UTILS.OcppCallType.ClientToServer,
@@ -139,13 +135,13 @@ WebSocketClient.prototype.open = function (url) {
           ])
         ); // ocpp heartbeat request
       }, this.ocppHeartBeatIntervalMs);
+    } else {
+      UTILS.Fn.warn("Do not know what to do with following received message");
+      console.log(msgArr);
     }
-    /*else{
-            UTILS.Fn.warn("Do not know what to do with following received message");
-        }*/
   });
 
-  this.instance.on("close", function clear(code, reason) {
+  this.instance.on("close", function wsOnClose(code) {
     switch (
       code // https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1
     ) {
@@ -154,16 +150,14 @@ WebSocketClient.prototype.open = function (url) {
           `Client ${that.clientId} - WebSocket: closed, code ${code}`
         );
         break;
-      case 1006: //Close Code 1006 is a special code that means the connection was closed abnormally (locally) by the browser implementation.
+      case 1006: // Close Code 1006 is a special code that means the connection was closed abnormally (locally) by the browser implementation.
         UTILS.Fn.err(
           `Client ${that.clientId} - WebSocket: closed abnormally, code ${code}`
         );
-        debugger;
         that.reconnect(code);
         break;
       default:
         // Abnormal closure
-        debugger;
         UTILS.Fn.err(
           `Client ${that.clientId} WebSocket: closed unknown, code ${code}`
         );
@@ -174,7 +168,7 @@ WebSocketClient.prototype.open = function (url) {
     clearTimeout(this.pingTimeout);
   });
 
-  this.instance.on("error", function (e) {
+  this.instance.on("error", (e) => {
     switch (e.code) {
       case "ECONNREFUSED":
         UTILS.Fn.err(
@@ -189,13 +183,14 @@ WebSocketClient.prototype.open = function (url) {
   });
 };
 
-WebSocketClient.prototype.msgId = function () {
+WebSocketClient.prototype.msgId = function wscMsgId() {
   // msg ID incremented
-  let inc = CP_ID + "_" + this.ocppMessageCounter++; // to string
+  this.ocppMessageCounter += 1;
+  const inc = `${CP_ID}_${this.ocppMessageCounter}`;
   return inc;
 };
 
-WebSocketClient.prototype.send = function (data, option) {
+WebSocketClient.prototype.send = function wscSend(data, option) {
   try {
     UTILS.Fn.data(`Client ${this.clientId} sending data to CS: `, data);
     this.instance.send(data, option);
@@ -204,15 +199,15 @@ WebSocketClient.prototype.send = function (data, option) {
   }
 };
 
-WebSocketClient.prototype.reconnect = function (e) {
-  var that = this;
+WebSocketClient.prototype.reconnect = function wscReconnect() {
+  const that = this;
   UTILS.Fn.lifecyc(
     `Client ${this.clientId} - WebSocketClient: retry in ${this.autoReconnectInterval}ms`
   );
   this.instance.removeAllListeners();
   clearInterval(this.ocppHeartBeatInterval);
 
-  setTimeout(function () {
+  setTimeout(function reconnect() {
     UTILS.Fn.lifecyc(
       `Client ${this.clientId} -WebSocketClient retry reconnecting ...`
     );
@@ -222,14 +217,12 @@ WebSocketClient.prototype.reconnect = function (e) {
 
 // CONCURRENCY SETUP - running multiple clients
 
-var CP_ID, URL, wsc;
-
-for (let clientIdx = 0; clientIdx < CONCURRENCY_LEVEL; clientIdx++) {
+for (let clientIdx = 0; clientIdx < CONCURRENCY_LEVEL; clientIdx += 1) {
   // build charge point identity - required by protocol
-  CP_ID = "SI-" + UTILS.Fn.uuidv4(); // required by protocol
+  CP_ID = `SI-${UTILS.Fn.uuidv4()}`; // required by protocol
   URL = `${CS_PROTOCOL}://${CS_HOST}:${CS_PORT}/${CP_ID}?cid=${clientIdx}`; // central system url
 
-  UTILS.Fn.lifecyc("Client is trying to connect to: " + URL);
+  UTILS.Fn.lifecyc(`Client is trying to connect to: ${URL}`);
 
   // create a client
   wsc = new WebSocketClient(clientIdx);
