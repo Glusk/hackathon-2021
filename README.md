@@ -9,23 +9,23 @@
 ```bash
 npm install
 ```
-# To start server
+# Running the server
 
-Open shell in root folder and start server
+Open shell in root folder and run:
 ```bash
 npm run start-server
 ```
 
-# To start client
+# Running a client
 
-Open shell in root folder and start server
+Open shell in root folder and run:
 ```bash
 npm run start-client
 ```
 
-# Start under docker 
+# Start under Docker 
 
-Attached **Dockerfile** demonstrates procedure for starting node application with docker. Important point is to install packages with node package manager (npm), copy source file over and then use custom scripts defined inside package.json to start node via npm. 
+Attached `Dockerfile` demonstrates procedure for starting node application with Docker. Important point is to install packages with node package manager (npm), copy source file over and then use custom scripts defined inside `package.json` to start node via npm. 
 
 Another approach can be used if you like. 
 
