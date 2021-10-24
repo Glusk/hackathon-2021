@@ -4,6 +4,7 @@ var UTILS = require("./utils.js");
 const http = require("http");
 const WebSocket = require("ws");
 const url = require("url");
+const moment = require("moment");
 const server = http.createServer();
 const wsServer = new WebSocket.Server( // represents websocket server
   { noServer: true } // issue manual upgrade
@@ -72,17 +73,7 @@ wsServer.on("connection", function connection(webSocket, req) {
     let msgNum = parseInt(ocppMsg[1], 16),
       msgType = ocppMsg[2];
 
-    let d = new Date();
-    var datestring =
-      ("0" + d.getDate()).slice(-2) +
-      "-" +
-      ("0" + (d.getMonth() + 1)).slice(-2) +
-      "-" +
-      d.getFullYear() +
-      " " +
-      ("0" + d.getHours()).slice(-2) +
-      ":" +
-      ("0" + d.getMinutes()).slice(-2);
+    var datestring = moment().format("DD-MM-YYYY HH:mm");
 
     // respond back to heartbeat message
     if (msgType.toLowerCase() === "Heartbeat".toLowerCase()) {
