@@ -228,14 +228,3 @@ for (let clientIdx = 0; clientIdx < CONCURRENCY_LEVEL; clientIdx += 1) {
   wsc = new WebSocketClient(clientIdx);
   wsc.open(URL);
 }
-
-// TEST SEQUENCE
-/*
-let CP_ID = 'SI-' + uuidv4(); // required by protocol 
-let URL = `${CS_PROTOCOL}://${CS_HOST}:${CS_PORT}/${CP_ID}`; // central system url
-console.log("Trying to connect to: " + URL);
-
-// create a client
-let wsc = new WebSocketClient();
-wsc.open(URL);
-*/
