@@ -92,7 +92,7 @@ WebSocketClient.prototype.open = function wscOpen(url) {
     ]);
 
     UTILS.Fn.data(
-      `Client ${that.clientId} sending bot notification`,
+      `Client ${that.clientId} sending boot notification`,
       bootNotificationPayload
     );
 
