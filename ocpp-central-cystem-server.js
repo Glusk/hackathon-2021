@@ -21,7 +21,7 @@ const HEARTBEAT_INT_MS = process.env.HEARTBEAT_INT_MS
 const LOG_PAYLOAD = process.env.LOG_PAYLOAD ? process.env.LOG_PAYLOAD : false; // data exchange verbose logging
 const LOG_LIFECYCLE = process.env.LOG_LIFECYCLE
   ? process.env.LOG_LIFECYCLE
-  : true; // lifecyle events (connect, reconnect, pingpong)
+  : true; // lifecycle events (connect, reconnect, pingpong)
 
 // setup logging library
 UTILS.Logging.EnablePayloadLogging = LOG_PAYLOAD;
@@ -45,11 +45,11 @@ wsServer.on("connection", function connection(webSocket, req) {
 
   UTILS.Fn.lifecyc(`Connected from: ${req.url}`);
 
-  // define manual propety on webSocket object to track liveliness
+  // define manual property on webSocket object to track liveliness
   webSocket.isAlive = true;
 
   webSocket.on("pong", function () {
-    // register handler, when client respons with PONG
+    // register handler, when client responds with PONG
 
     UTILS.Fn.log(`Received heartbeat PONG`);
 
@@ -57,7 +57,7 @@ wsServer.on("connection", function connection(webSocket, req) {
   });
 
   webSocket.on("message", function incoming(message) {
-    // recive msg from client
+    // receive msg from client
     debugger;
 
     UTILS.Fn.data("Received: ", message);
@@ -86,7 +86,7 @@ wsServer.on("connection", function connection(webSocket, req) {
         ])
       );
     } else if (msgType.toLowerCase() === "BootNotification".toLowerCase()) {
-      // confirm bo0t notification - send back ocpp boot notification response
+      // confirm boot notification - send back ocpp boot notification response
       webSocket.send(
         JSON.stringify([
           UTILS.OcppCallType.ServerToClient,
@@ -145,11 +145,11 @@ function stripTrailingSlash(str) {
   return str;
 }
 
-// purpose of this interval is to reset isAlive for all cients
+// purpose of this interval is to reset isAlive for all clients
 const intervalHeartbeat = setInterval(function ping() {
   if (wsServer.clients.length === 0) return;
 
-  // notvery sufficient, but only way - iteration through internal structure
+  // not very efficient, but only way - iteration through internal structure
   wsServer.clients.forEach(function each(wsClient) {
     if (wsClient.isAlive === false) {
       // not reachable any more

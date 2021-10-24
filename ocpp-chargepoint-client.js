@@ -20,7 +20,7 @@ const CONCURRENCY_LEVEL = process.env.CONCURRENCY_LEVEL
 const LOG_PAYLOAD = process.env.LOG_PAYLOAD ? process.env.LOG_PAYLOAD : false; // data exchange verbose logging
 const LOG_LIFECYCLE = process.env.LOG_LIFECYCLE
   ? process.env.LOG_LIFECYCLE
-  : true; // lifecyle events (connect, reconnect, pingpong)
+  : true; // lifecycle events (connect, reconnect, pingpong)
 
 // setup logging library
 UTILS.Logging.EnablePayloadLogging = LOG_PAYLOAD;
@@ -190,7 +190,7 @@ WebSocketClient.prototype.open = function (url) {
 };
 
 WebSocketClient.prototype.msgId = function () {
-  // msg ID incrementer
+  // msg ID incremented
   let inc = CP_ID + "_" + this.ocppMessageCounter++; // to string
   return inc;
 };
@@ -225,7 +225,7 @@ WebSocketClient.prototype.reconnect = function (e) {
 var CP_ID, URL, wsc;
 
 for (let clientIdx = 0; clientIdx < CONCURRENCY_LEVEL; clientIdx++) {
-  // build chargepoint identity - required by protocol
+  // build charge point identity - required by protocol
   CP_ID = "SI-" + UTILS.Fn.uuidv4(); // required by protocol
   URL = `${CS_PROTOCOL}://${CS_HOST}:${CS_PORT}/${CP_ID}?cid=${clientIdx}`; // central system url
 
