@@ -1,5 +1,3 @@
-"use strict";
-
 const UTILS = {
   Fn: {
     /**
@@ -8,20 +6,21 @@ const UTILS = {
      * @param {object} data - javascript object or json string
      * @param {string} color - our color enum
      */
-    log: function (msg, data, color) {
+    log(msg, data, color) {
       if (arguments.length === 3) {
+        let print = data;
         // try parse to json
         if (typeof data === "string" || data instanceof String) {
           try {
-            data = JSON.parse(data);
+            print = JSON.parse(data);
           } catch (e) {
-            console.warn("unable to parse " + data);
+            console.warn(`unable to parse ${data}`);
           }
         }
 
         // change color and then restore it back
         console.log(color, msg, UTILS.Color.Default);
-        console.log(data);
+        console.log(print);
       } else if (arguments.length === 2) {
         // HACK : data is actually color here
         console.log(data, msg, UTILS.Color.Default);
@@ -31,37 +30,36 @@ const UTILS = {
     },
 
     /** Logs data payload - consumes huge amount of IO */
-    data: function (msg, data) {
+    data(msg, data) {
       if (!UTILS.Logging.EnablePayloadLogging) return;
       UTILS.Fn.log(msg, data, UTILS.Color.Default);
     },
 
     /** Logs error */
-    err: function (msg, err) {
+    err(msg, err) {
       UTILS.Fn.log(msg, UTILS.Color.BgRed);
-      err && console.error(err);
+      if (err) console.error(err);
     },
 
     /** Logs error that should not interfere with process */
-    warn: function (msg) {
+    warn(msg) {
       UTILS.Fn.log(msg, UTILS.Color.Yellow);
     },
 
     /** Lifecycle event */
-    lifecyc: function (msg) {
+    lifecyc(msg) {
       UTILS.Fn.log(msg, UTILS.Color.Magenta);
     },
 
     /** Create GUID to uniquely identify client */
-    uuidv4: function () {
-      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-        /[xy]/g,
-        function (c) {
-          var r = (Math.random() * 16) | 0,
-            v = c == "x" ? r : (r & 0x3) | 0x8;
-          return v.toString(16);
-        }
-      );
+    uuidv4() {
+      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+        // eslint-disable-next-line no-bitwise
+        const r = (Math.random() * 16) | 0;
+        // eslint-disable-next-line no-bitwise
+        const v = c === "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      });
     },
   },
 
