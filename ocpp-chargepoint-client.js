@@ -2,6 +2,7 @@
 
 const WebSocket = require("ws");
 const UTILS = require("./utils.js");
+const moment = require("moment");
 
 // Connection settings
 const OPENING_HANDSHAKE_TIMEOUT_MS = 120 * 1000; // wait time for protocol upgrade call
@@ -114,8 +115,6 @@ WebSocketClient.prototype.open = function (url) {
       return false;
     }
 
-    let t = new Date();
-
     // in boot notification we receive interval for heartbeat
     if (msgArr[0] === 3 && msgArr[2]["interval"]) {
       // boot notification response
@@ -127,9 +126,7 @@ WebSocketClient.prototype.open = function (url) {
 
       UTILS.Fn.lifecyc(
         `Client ${that.clientId} Next interval will be at: ` +
-          new Date(
-            t.setSeconds(t.getSeconds() + this.ocppHeartBeatIntervalMs / 1000)
-          )
+          moment().add(this.ocppHeartBeatIntervalMs, "ms").toString()
       );
 
       this.ocppHeartBeatInterval = setInterval(function () {
