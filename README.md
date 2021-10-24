@@ -33,15 +33,15 @@ Another approach can be used if you like.
 
 ### Server
 
-1. Servers accepts client conections and upgrades them to websocket protocol
-2. It responds to various OCPP messages
-3. Ocasionally it send PING / PONG to determine which clients are still alive
+1. Server accepts client connections and upgrades them to websocket protocol.
+2. It responds to various OCPP messages.
+3. Occasionally, it sends a PING / PONG to determine which clients are still alive.
 
 ### Client
 
-1. When client connects with websocket, it sends boot notification. 
-2. After response is recevied, it reads heartbeat interval from it
-3. it send heartbeat message according to interval
+1. When a client connects to the server via a websocket, it sends a boot notification. 
+2. After a response is received, it reads the heartbeat interval from it.
+3. It sends heartbeat message according to the interval.
 
 ## Environment variables
 
