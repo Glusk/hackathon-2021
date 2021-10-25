@@ -4,12 +4,27 @@
   "description": "Emulates OCPP 1.6 Central system and chargepoint client",
   "main": "ocpp-central-cystem-server.js",
   "scripts": {
+    "lint": "eslint . && npx prettier --check .",
     "server": "node ocpp-central-cystem-server.js",
     "client": "node ocpp-chargepoint-client.js"
+  },
+  "eslintConfig": {
+    "extends": [
+      "airbnb-base",
+      "prettier"
+    ]
   },
   "author": "mitja.gustin@etrel.si",
   "license": "ISC",
   "dependencies": {
+    "moment": "^2.29.1",
     "ws": "^7.4.5"
+  },
+  "devDependencies": {
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.22.1",
+    "prettier": "2.4.1"
   }
 }
