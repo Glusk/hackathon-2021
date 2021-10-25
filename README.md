@@ -1,6 +1,6 @@
 # [OCPP 1.6](https://www.openchargealliance.org/protocols/ocpp-16/) Central System and Charge Point Emulator
 
-[![Node.js CI](https://github.com/Glusk/hackaton-2021/actions/workflows/node.js.yml/badge.svg)](https://github.com/Glusk/hackaton-2021/actions/workflows/node.js.yml)
+[![Node.js CI](https://github.com/Glusk/hackaton-2021/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/Glusk/hackaton-2021/actions/workflows/node.js.yml)
 
 ## Install
 
