@@ -12,7 +12,7 @@ const wsServer = new WebSocket.Server( // represents websocket server
 // env variable
 const WEB_SRV_HOST = process.env.WEB_SRV_HOST
   ? process.env.WEB_SRV_HOST
-  : "localhost"; // interface to bind to (could be only one)
+  : "0.0.0.0"; // interface to bind to (could be only one)
 const WEB_SRV_PORT = process.env.WEB_SRV_PORT ? process.env.WEB_SRV_PORT : 8080; // port on bind interface
 const HEARTBEAT_INT_MS = process.env.HEARTBEAT_INT_MS
   ? process.env.HEARTBEAT_INT_MS
