@@ -49,7 +49,6 @@ WebSocketClient.prototype.open = function wscOpen(url) {
     rejectUnauthorized: false,
   });
 
-  // NOTE: we are not using ping / pong functionality on our
   this.instance.on("ping", function wsOnPing() {
     UTILS.Fn.log(`Client ${that.clientId} received PING`);
 
