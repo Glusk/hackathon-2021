@@ -111,7 +111,7 @@ WebSocketClient.prototype.open = function wscOpen(url) {
     }
 
     // in boot notification we receive interval for heartbeat
-    if (msgArr[0] === 3 && msgArr[2].interval) {
+    if (msgArr[0] === UTILS.OcppCallType.ServerToClient && msgArr[2].interval) {
       // boot notification response
 
       this.ocppHeartBeatIntervalMs =
