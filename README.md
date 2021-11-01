@@ -27,11 +27,14 @@ Open shell in root folder and run:
 npm run client
 ```
 
-## Start under Docker
+## Running with Docker
 
-Attached `Dockerfile` demonstrates procedure for starting node application with Docker. Important point is to install packages with node package manager (npm), copy source file over and then use custom scripts defined inside `package.json` to start node via npm.
+Attached `Dockerfile` is used to generate the container image of
+this project. The latest image is hosted on DockerHub
+([glusk/hackathon-2021](https://hub.docker.com/repository/docker/glusk/hackathon-2021)).
 
-Another approach can be used if you like.
+The image is meant to be used in a Docker Compose script file.
+
 
 ## Some general info on inner flow
 
