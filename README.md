@@ -16,7 +16,7 @@
 Open shell in root folder and run:
 
 ```bash
-npm run start-server
+npm run server
 ```
 
 ## Running a client
@@ -24,7 +24,7 @@ npm run start-server
 Open shell in root folder and run:
 
 ```bash
-npm run start-client
+npm run client
 ```
 
 ## Start under Docker
