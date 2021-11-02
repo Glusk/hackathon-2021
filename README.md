@@ -27,7 +27,7 @@ Open shell in root folder and run:
 npm run client
 ```
 
-## Running with Docker
+## Docker image
 
 Attached `Dockerfile` is used to generate the container image of
 this project. The latest image is hosted on DockerHub
@@ -35,6 +35,32 @@ this project. The latest image is hosted on DockerHub
 
 The image is meant to be used in a Docker Compose script file.
 
+## Docker Swarm orchestration
+
+The Docker image of this project can be used to setup the deployment of client
+and server tasks. A sample `docker-compose.yml` could look like this:
+
+```yml
+version: '3.9'
+
+services:
+  node-server:
+    image: glusk/hackathon-2021:latest
+    ports:
+      - 8080:8080
+    command: npm run server
+    deploy:
+      endpoint_mode: dnsrr
+  node-client:
+    image: glusk/hackathon-2021:latest
+    environment:
+      - CS_HOST=172.19.0.8
+      - CS_PROTOCOL=wss
+    command: npm run client
+    deploy:
+      mode: replicated
+      replicas: 6
+```
 
 ## Some general info on inner flow
 
