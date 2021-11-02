@@ -16,7 +16,7 @@
 Open shell in root folder and run:
 
 ```bash
-npm run start-server
+npm run server
 ```
 
 ## Running a client
@@ -24,14 +24,43 @@ npm run start-server
 Open shell in root folder and run:
 
 ```bash
-npm run start-client
+npm run client
 ```
 
-## Start under Docker
+## Docker image
 
-Attached `Dockerfile` demonstrates procedure for starting node application with Docker. Important point is to install packages with node package manager (npm), copy source file over and then use custom scripts defined inside `package.json` to start node via npm.
+Attached `Dockerfile` is used to generate the container image of
+this project. The latest image is hosted on DockerHub
+([glusk/hackathon-2021](https://hub.docker.com/repository/docker/glusk/hackathon-2021)).
 
-Another approach can be used if you like.
+The image is meant to be used in a Docker Compose script file.
+
+## Docker Swarm orchestration
+
+The Docker image of this project can be used to setup the deployment of client
+and server tasks. A sample `docker-compose.yml` could look like this:
+
+```yml
+version: "3.9"
+
+services:
+  node-server:
+    image: glusk/hackathon-2021:latest
+    ports:
+      - 8080:8080
+    command: npm run server
+    deploy:
+      endpoint_mode: dnsrr
+  node-client:
+    image: glusk/hackathon-2021:latest
+    environment:
+      - CS_HOST=172.19.0.8
+      - CS_PROTOCOL=wss
+    command: npm run client
+    deploy:
+      mode: replicated
+      replicas: 6
+```
 
 ## Some general info on inner flow
 
