@@ -41,7 +41,7 @@ The Docker image of this project can be used to setup the deployment of client
 and server tasks. A sample `docker-compose.yml` could look like this:
 
 ```yml
-version: '3.9'
+version: "3.9"
 
 services:
   node-server:
