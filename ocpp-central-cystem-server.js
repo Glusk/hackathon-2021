@@ -1,14 +1,10 @@
-const fs = require("fs");
-const https = require("https");
+const http = require("http");
 const WebSocket = require("ws");
 const url = require("url");
 const moment = require("moment");
 const UTILS = require("./utils.js");
 
-const server = https.createServer({
-  cert: fs.readFileSync("hackathon-cert.pem"),
-  key: fs.readFileSync("hackathon-key.pem"),
-});
+const server = http.createServer();
 const wsServer = new WebSocket.Server( // represents websocket server
   { noServer: true } // issue manual upgrade
 );
@@ -137,5 +133,5 @@ server.on("upgrade", (request, socket, head) => {
 
 // start http server
 server.listen(WEB_SRV_PORT, WEB_SRV_HOST, () => {
-  console.log(`Server is running on https://${WEB_SRV_HOST}:${WEB_SRV_PORT}`);
+  console.log(`Server is running on http://${WEB_SRV_HOST}:${WEB_SRV_PORT}`);
 });
