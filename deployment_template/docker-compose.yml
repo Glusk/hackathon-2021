@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  proxy:
+    image: haproxy
+    ports:
+      - target: 80
+        published: 80
+      - target: 443
+        published: 443
+    volumes:
+      - ./cert/hackathon.pem:/etc/ssl/certs/hackathon.pem
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    networks:
+      - servers-network
+  node-server:
+    image: glusk/hackathon-2021:latest
+    command: npm run server
+    deploy:
+      mode: replicated
+      replicas: 2
+    networks:
+      - servers-network
+  node-client:
+    image: glusk/hackathon-2021:latest
+    environment:
+      # edit CS_HOST to match the public IP of your "manager" node
+      - CS_HOST=3.67.102.97
+      - CS_PORT=443
+      - CS_PROTOCOL=wss
+    command: npm run client
+    deploy:
+      mode: replicated
+      replicas: 6
+    networks:
+      - clients-network
+networks:
+  servers-network:
+    driver: overlay
+  clients-network:
+    driver: overlay
