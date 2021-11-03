@@ -15,9 +15,6 @@ services:
       - servers-network
   node-server:
     image: glusk/hackathon-2021:latest
-    ports:
-      - target: 8080
-        published: 8080
     command: npm run server
     deploy:
       mode: replicated
