@@ -27,6 +27,7 @@ services:
   node-client:
     image: glusk/hackathon-2021:latest
     environment:
+      # edit CS_HOST to match the public IP of your "manager" node
       - CS_HOST=3.67.102.97
       - CS_PORT=443
       - CS_PROTOCOL=wss
