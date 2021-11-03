@@ -37,30 +37,7 @@ The image is meant to be used in a Docker Compose script file.
 
 ## Docker Swarm orchestration
 
-The Docker image of this project can be used to setup the deployment of client
-and server tasks. A sample `docker-compose.yml` could look like this:
-
-```yml
-version: "3.9"
-
-services:
-  node-server:
-    image: glusk/hackathon-2021:latest
-    ports:
-      - 8080:8080
-    command: npm run server
-    deploy:
-      endpoint_mode: dnsrr
-  node-client:
-    image: glusk/hackathon-2021:latest
-    environment:
-      - CS_HOST=172.19.0.8
-      - CS_PROTOCOL=wss
-    command: npm run client
-    deploy:
-      mode: replicated
-      replicas: 6
-```
+Refer to [./deployment_template/README.md](./deployment_template/README.md)
 
 ## Some general info on inner flow
 
