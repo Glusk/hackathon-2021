@@ -37,13 +37,13 @@ this project. The latest image is hosted on DockerHub:
 
 First, build and tag:
 
-``` bash
+```bash
 docker build -t glusk/hackathon-2021 .
 ```
 
 Then, push to DockerHub:
 
-``` bash
+```bash
 docker push glusk/hackathon-2021:latest
 ```
 
