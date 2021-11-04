@@ -12,6 +12,7 @@ services:
       - ./cert/hackathon.pem:/etc/ssl/certs/hackathon.pem
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
     deploy:
+      mode: global
       placement:
         constraints: [node.role == manager]
     networks:
