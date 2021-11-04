@@ -30,8 +30,8 @@ npm run client
 ## Docker image
 
 Attached `Dockerfile` is used to generate the container image of
-this project. The latest image is hosted on DockerHub
-([glusk/hackathon-2021](https://hub.docker.com/repository/docker/glusk/hackathon-2021)).
+this project. The latest image is hosted on DockerHub:
+[`glusk/hackathon-2021`](https://hub.docker.com/repository/docker/glusk/hackathon-2021).
 
 ### Creating/updating the image
 
@@ -46,8 +46,6 @@ Then, push to DockerHub:
 ``` bash
 docker push glusk/hackathon-2021:latest
 ```
-
-The image is meant to be used in a Docker Compose script file.
 
 ## Docker Swarm orchestration
 
