@@ -24,3 +24,7 @@ docker stack deploy --compose-file=docker-compose.yml hackathon-2021
 The manager node should be a 4 core CPU.
 
 Worker nodes can run on 1GHz single core CPUs.
+
+## View deployment statistics report
+
+Go to: `<PUBLIC_IP_OF_YOUR_MANAGER_NODE>:8404/stats`
