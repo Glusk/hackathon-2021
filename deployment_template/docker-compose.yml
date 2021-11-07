@@ -25,6 +25,7 @@ services:
     deploy:
       mode: replicated
       replicas: 2
+      endpoint_mode: dnsrr
     networks:
       - servers-network
   node-client:
