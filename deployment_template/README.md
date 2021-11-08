@@ -5,6 +5,12 @@ this emulator to a Docker Swarm environment.
 
 # Host system setup
 
+The test is meant to be run on 1 *manager* node and 20 *worker* nodes. Therefore,
+we require the following host systems:
+
+- 1x 4 core CPU manager host with 32GB of memory
+- 20x 1 core CPU worker hosts with 4GB of memory
+
 The manager node runs HAProxy. In order for it to accept 1 million connections,
 the number of open files limit has to be increased to roughly around 2 million.
 To do so, run:
@@ -39,12 +45,6 @@ Then run the following command on your manager node:
 ```bash
 docker stack deploy --compose-file=docker-compose.yml hackathon-2021
 ```
-
-## Host system requirements
-
-The manager node should be a 4 core CPU.
-
-Worker nodes can run on 1GHz single core CPUs.
 
 ## View deployment statistics report
 
