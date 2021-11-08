@@ -11,6 +11,29 @@ we require the following host systems:
 - 1x 4 core CPU manager host with 32GB of memory
 - 20x 1 core CPU worker hosts with 4GB of memory
 
+## Shared setup
+
+Every host system needs to be equipped with Docker. Here's a snippet on how
+to do so from https://dockerswarm.rocks:
+
+```bash
+# ssh into your instance
+# ...
+
+# Install the latest updates
+apt-get update
+apt-get upgrade -y
+
+# Download Docker
+curl -fsSL get.docker.com -o get-docker.sh
+# Install Docker using the stable channel (instead of the default "edge")
+CHANNEL=stable sh get-docker.sh
+# Remove Docker install script
+rm get-docker.sh
+```
+
+## Manager-specific setup
+
 The manager node runs HAProxy. In order for it to accept 1 million connections,
 the number of open files limit has to be increased to roughly around 2 million.
 To do so, run:
