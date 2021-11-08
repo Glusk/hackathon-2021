@@ -17,6 +17,10 @@ services:
       mode: global
       placement:
         constraints: [node.role == manager]
+    ulimits:
+      nofile:
+        soft: 2005000
+        hard: 2005000
     networks:
       - servers-network
   node-server:
