@@ -28,7 +28,9 @@ services:
     command: npm run server
     deploy:
       mode: replicated
-      replicas: 2
+      placement:
+        max_replicas_per_node: 1
+      replicas: 20
       endpoint_mode: dnsrr
     networks:
       - servers-network
@@ -42,7 +44,9 @@ services:
     command: npm run client
     deploy:
       mode: replicated
-      replicas: 6
+      placement:
+        max_replicas_per_node: 1
+      replicas: 20
     networks:
       - clients-network
 networks:
