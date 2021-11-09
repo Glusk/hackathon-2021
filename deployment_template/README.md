@@ -3,7 +3,7 @@
 This sub-folder contains the configuration files which are required to deploy
 this emulator to a Docker Swarm environment.
 
-# Host system setup
+## Host system setup
 
 The test is meant to be run on 1 _manager_ node and 20 _worker_ nodes. Therefore,
 we require the following host systems:
@@ -11,7 +11,7 @@ we require the following host systems:
 - 1x 4 core CPU manager host with 32GB of memory
 - 20x 1 core CPU worker hosts with 4GB of memory
 
-## Shared setup
+### Shared setup
 
 Every host system needs to be equipped with Docker. Here's a snippet on how
 to do so, taken from https://dockerswarm.rocks:
@@ -32,7 +32,7 @@ CHANNEL=stable sh get-docker.sh
 rm get-docker.sh
 ```
 
-## Manager-specific setup
+### Manager-specific setup
 
 The manager node runs HAProxy. In order for it to accept 1 million connections,
 the number of open files limit has to be increased to roughly around 2 million.
@@ -53,7 +53,7 @@ exit
 
 Note that this configuration change doesn't persist upon re-boot.
 
-## Worker-specific setup
+### Worker-specific setup
 
 Worker nodes run 1 server and 1 client task each. In order to allow clients
 to initiate 50,000 connections, we need to increase the port range. This can
