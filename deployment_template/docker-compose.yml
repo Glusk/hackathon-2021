@@ -41,6 +41,7 @@ services:
       - CS_HOST=3.67.102.97
       - CS_PORT=443
       - CS_PROTOCOL=wss
+      - CONCURRENCY_LEVEL=50000
     command: npm run client
     deploy:
       mode: replicated
