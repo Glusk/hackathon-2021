@@ -5,7 +5,7 @@ this emulator to a Docker Swarm environment.
 
 # Host system setup
 
-The test is meant to be run on 1 *manager* node and 20 *worker* nodes. Therefore,
+The test is meant to be run on 1 _manager_ node and 20 _worker_ nodes. Therefore,
 we require the following host systems:
 
 - 1x 4 core CPU manager host with 32GB of memory
