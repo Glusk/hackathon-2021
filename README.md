@@ -49,7 +49,7 @@ docker push glusk/hackathon-2021:latest
 
 ## Docker Swarm orchestration
 
-Refer to [./deployment_template/README.md](./deployment_template/README.md)
+Refer to: [`./deployment_template/`](./deployment_template/)
 
 ## Some general info on inner flow
 
@@ -80,6 +80,6 @@ Refer to [./deployment_template/README.md](./deployment_template/README.md)
 
 1. **WEB_SRV_HOST** interface to bind to (could be only one)
 2. **WEB_SRV_PORT** port on bind interface
-3. **HEARTBEAT_INT_MS** interval in which we check client if its still connected
+3. **HEARTBEAT_INT_MS** the interval at which we check client connectivity
 4. **LOG_PAYLOAD** verbose logging of data exchange between client and server
 5. **LOG_LIFECYCLE** = log lifecycle events (connect, reconnect, ping/pong)

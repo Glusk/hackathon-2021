@@ -208,7 +208,7 @@ WebSocketClient.prototype.reconnect = function wscReconnect() {
 
   setTimeout(function reconnect() {
     UTILS.Fn.lifecyc(
-      `Client ${this.clientId} -WebSocketClient retry reconnecting ...`
+      `Client ${this.clientId} - WebSocketClient retry reconnecting...`
     );
     that.open(that.url);
   }, this.autoReconnectInterval);
