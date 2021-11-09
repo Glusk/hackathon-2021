@@ -16,7 +16,7 @@ const WEB_SRV_HOST = process.env.WEB_SRV_HOST
 const WEB_SRV_PORT = process.env.WEB_SRV_PORT ? process.env.WEB_SRV_PORT : 8080; // port on bind interface
 const HEARTBEAT_INT_MS = process.env.HEARTBEAT_INT_MS
   ? process.env.HEARTBEAT_INT_MS
-  : 30000; // interval in which we check client if its still connected
+  : 30000; // the interval at which we check client connectivity
 const LOG_PAYLOAD = process.env.LOG_PAYLOAD ? process.env.LOG_PAYLOAD : false; // data exchange verbose logging
 const LOG_LIFECYCLE = process.env.LOG_LIFECYCLE
   ? process.env.LOG_LIFECYCLE
