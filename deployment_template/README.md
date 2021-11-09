@@ -14,7 +14,7 @@ we require the following host systems:
 ## Shared setup
 
 Every host system needs to be equipped with Docker. Here's a snippet on how
-to do so from https://dockerswarm.rocks:
+to do so, taken from https://dockerswarm.rocks:
 
 ```bash
 # ssh into your instance
