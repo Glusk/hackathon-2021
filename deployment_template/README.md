@@ -5,6 +5,35 @@ this emulator to a Docker Swarm environment.
 
 # Host system setup
 
+The test is meant to be run on 1 _manager_ node and 20 _worker_ nodes. Therefore,
+we require the following host systems:
+
+- 1x 4 core CPU manager host with 32GB of memory
+- 20x 1 core CPU worker hosts with 4GB of memory
+
+## Shared setup
+
+Every host system needs to be equipped with Docker. Here's a snippet on how
+to do so, taken from https://dockerswarm.rocks:
+
+```bash
+# ssh into your instance
+# ...
+
+# Install the latest updates
+apt-get update
+apt-get upgrade -y
+
+# Download Docker
+curl -fsSL get.docker.com -o get-docker.sh
+# Install Docker using the stable channel (instead of the default "edge")
+CHANNEL=stable sh get-docker.sh
+# Remove Docker install script
+rm get-docker.sh
+```
+
+## Manager-specific setup
+
 The manager node runs HAProxy. In order for it to accept 1 million connections,
 the number of open files limit has to be increased to roughly around 2 million.
 To do so, run:
@@ -14,6 +43,29 @@ To do so, run:
 sudo su -
 # 2. increase the open files limit
 sysctl -w fs.nr_open=2010000
+# 3. save changes and exit
+sysctl -p
+exit
+# 4. now you are back in the user shell; you need to re-log
+# from this shell as well for the changes to take effect
+exit
+```
+
+Note that this configuration change doesn't persist upon re-boot.
+
+## Worker-specific setup
+
+Worker nodes run 1 server and 1 client task each. In order to allow clients
+to initiate 50,000 connections, we need to increase the port range. This can
+be done like so:
+
+```bash
+# 1. change to root
+sudo su -
+# 2. increase the port range
+# we need 50,000 ports + a little extra; the manual recommends
+# that one boundary be odd and the other even
+sysctl -w net.ipv4.ip_local_port_range="14001 65000"
 # 3. save changes and exit
 sysctl -p
 exit
@@ -39,12 +91,6 @@ Then run the following command on your manager node:
 ```bash
 docker stack deploy --compose-file=docker-compose.yml hackathon-2021
 ```
-
-## Host system requirements
-
-The manager node should be a 4 core CPU.
-
-Worker nodes can run on 1GHz single core CPUs.
 
 ## View deployment statistics report
 
