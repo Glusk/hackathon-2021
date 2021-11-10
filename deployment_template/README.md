@@ -5,8 +5,8 @@ this emulator to a Docker Swarm environment.
 
 ## Host system setup
 
-The test is meant to be run on 1 _manager_ node and 20 _worker_ nodes. Therefore,
-we require the following host systems:
+The test is meant to be performed on 1 _manager_ node and 20 _worker_ nodes
+running Ubuntu 20.04 LTS. Therefore, we require the following host systems:
 
 - 1x 4 core CPU manager host with 32GB of memory
 - 20x 1 core CPU worker hosts with 4GB of memory
