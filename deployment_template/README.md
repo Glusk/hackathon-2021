@@ -77,6 +77,23 @@ exit
 exit
 ```
 
+The value of `nf_conntrack_max` also needs to be increased:
+
+```bash
+# 1. change to root
+sudo su -
+# 2. increase nf_conntrack_max
+# suggested formula: CONNTRACK_MAX = RAMSIZE (in bytes) / 16384 / (ARCH / 32)
+# So, for 32GB RAM and a 64 bit system: 32*1024^3/16384/2=1048576
+sysctl -w net.netfilter.nf_conntrack_max=1048576
+# 3. save changes and exit
+sysctl -p
+exit
+# 4. now you are back in the user shell; you need to re-log
+# from this shell as well for the changes to take effect
+exit
+```
+
 Note that this configuration change doesn't persist upon re-boot.
 
 ## How to deploy
