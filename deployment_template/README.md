@@ -32,6 +32,32 @@ CHANNEL=stable sh get-docker.sh
 rm get-docker.sh
 ```
 
+Worker nodes run 1 server and 1 client task each. In order to allow clients
+to initiate 50,000 connections, we need to increase the port range.
+
+The manager node needs to be able to open connections to the respective backend
+servers. With each server accepting up to 50,000 connections, we have to
+increase the port range on the manager node as well.
+
+This can be done like so:
+
+```bash
+# 1. change to root
+sudo su -
+# 2. increase the port range
+# we need 50,000 ports + a little extra; the manual recommends
+# that one boundary be odd and the other even
+sysctl -w net.ipv4.ip_local_port_range="14001 65000"
+# 3. save changes and exit
+sysctl -p
+exit
+# 4. now you are back in the user shell; you need to re-log
+# from this shell as well for the changes to take effect
+exit
+```
+
+Note that this configuration change doesn't persist upon re-boot.
+
 ### Manager-specific setup
 
 The manager node runs HAProxy. In order for it to accept 1 million connections,
@@ -43,29 +69,6 @@ To do so, run:
 sudo su -
 # 2. increase the open files limit
 sysctl -w fs.nr_open=2010000
-# 3. save changes and exit
-sysctl -p
-exit
-# 4. now you are back in the user shell; you need to re-log
-# from this shell as well for the changes to take effect
-exit
-```
-
-Note that this configuration change doesn't persist upon re-boot.
-
-### Worker-specific setup
-
-Worker nodes run 1 server and 1 client task each. In order to allow clients
-to initiate 50,000 connections, we need to increase the port range. This can
-be done like so:
-
-```bash
-# 1. change to root
-sudo su -
-# 2. increase the port range
-# we need 50,000 ports + a little extra; the manual recommends
-# that one boundary be odd and the other even
-sysctl -w net.ipv4.ip_local_port_range="14001 65000"
 # 3. save changes and exit
 sysctl -p
 exit
