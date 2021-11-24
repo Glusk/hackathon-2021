@@ -32,8 +32,13 @@ function authenticate(request, cbAuthenticated) {
 wsServer.on("connection", (webSocket, req) => {
   UTILS.Fn.lifecyc(`Connected from: ${req.url}`);
 
+  // eslint-disable-next-line no-param-reassign
+  webSocket.isAlive = true;
+
   webSocket.on("pong", () => {
     UTILS.Fn.log(`Received heartbeat PONG`);
+    // eslint-disable-next-line no-param-reassign
+    webSocket.isAlive = true;
   });
 
   webSocket.on("message", (message) => {
@@ -92,11 +97,13 @@ function logClient(client) {
 // ping connected clients
 const intervalHeartbeat = setInterval(() => {
   wsServer.clients.forEach((wsClient) => {
-    if (wsClient.readyState !== WebSocket.OPEN) {
-      UTILS.Fn.lifecyc("Terminating unreachable client");
+    if (wsClient.isAlive === false) {
+      UTILS.Fn.lifecyc("Terminating unresponsive client");
       wsClient.terminate();
     } else {
       UTILS.Fn.lifecyc(`Triggering ping to client: ${logClient(wsClient)}`);
+      // eslint-disable-next-line no-param-reassign
+      wsClient.isAlive = false;
       wsClient.ping();
     }
   });
