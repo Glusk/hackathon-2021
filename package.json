@@ -2,11 +2,11 @@
   "name": "Etrel.OCPP.Emulator",
   "version": "1.1.0",
   "description": "Emulates OCPP 1.6 Central System and Charge Point client",
-  "main": "ocpp-central-cystem-server.js",
+  "main": "ocpp-central-system-server.js",
   "scripts": {
     "lint": "eslint . && npx prettier --check .",
-    "server": "node ocpp-central-cystem-server.js",
-    "client": "node ocpp-chargepoint-client.js"
+    "server": "node ocpp-central-system-server.js",
+    "client": "node ocpp-charge-point-client.js"
   },
   "eslintConfig": {
     "extends": [
