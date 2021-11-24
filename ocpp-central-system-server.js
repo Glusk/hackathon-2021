@@ -10,17 +10,11 @@ const wsServer = new WebSocket.Server( // represents websocket server
 );
 
 // env variable
-const WEB_SRV_HOST = process.env.WEB_SRV_HOST
-  ? process.env.WEB_SRV_HOST
-  : "0.0.0.0"; // interface to bind to (could be only one)
-const WEB_SRV_PORT = process.env.WEB_SRV_PORT ? process.env.WEB_SRV_PORT : 8080; // port on bind interface
-const HEARTBEAT_INT_MS = process.env.HEARTBEAT_INT_MS
-  ? process.env.HEARTBEAT_INT_MS
-  : 30000; // the interval at which we check client connectivity
-const LOG_PAYLOAD = process.env.LOG_PAYLOAD ? process.env.LOG_PAYLOAD : false; // data exchange verbose logging
-const LOG_LIFECYCLE = process.env.LOG_LIFECYCLE
-  ? process.env.LOG_LIFECYCLE
-  : true; // lifecycle events (connect, reconnect, ping/pong)
+const WEB_SRV_HOST = process.env.WEB_SRV_HOST || "0.0.0.0"; // interface to bind to (could be only one)
+const WEB_SRV_PORT = process.env.WEB_SRV_PORT || 8080; // port on bind interface
+const HEARTBEAT_INT_MS = process.env.HEARTBEAT_INT_MS || 30000; // the interval at which we check client connectivity
+const LOG_PAYLOAD = process.env.LOG_PAYLOAD || false; // data exchange verbose logging
+const LOG_LIFECYCLE = process.env.LOG_LIFECYCLE || true; // lifecycle events (connect, reconnect, ping/pong)
 
 // setup logging library
 UTILS.Logging.EnablePayloadLogging = LOG_PAYLOAD;
@@ -38,8 +32,13 @@ function authenticate(request, cbAuthenticated) {
 wsServer.on("connection", (webSocket, req) => {
   UTILS.Fn.lifecyc(`Connected from: ${req.url}`);
 
+  // eslint-disable-next-line no-param-reassign
+  webSocket.isAlive = true;
+
   webSocket.on("pong", () => {
     UTILS.Fn.log(`Received heartbeat PONG`);
+    // eslint-disable-next-line no-param-reassign
+    webSocket.isAlive = true;
   });
 
   webSocket.on("message", (message) => {
@@ -98,11 +97,13 @@ function logClient(client) {
 // ping connected clients
 const intervalHeartbeat = setInterval(() => {
   wsServer.clients.forEach((wsClient) => {
-    if (wsClient.readyState !== WebSocket.OPEN) {
-      UTILS.Fn.lifecyc("Terminating unreachable client");
+    if (wsClient.isAlive === false) {
+      UTILS.Fn.lifecyc("Terminating unresponsive client");
       wsClient.terminate();
     } else {
       UTILS.Fn.lifecyc(`Triggering ping to client: ${logClient(wsClient)}`);
+      // eslint-disable-next-line no-param-reassign
+      wsClient.isAlive = false;
       wsClient.ping();
     }
   });
