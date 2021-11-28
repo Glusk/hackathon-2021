@@ -21,6 +21,9 @@ services:
       nofile:
         soft: 2005000
         hard: 2005000
+    sysctls:
+      - net.ipv4.ip_local_port_range="14001 65000"
+      - net.netfilter.nf_conntrack_max=1048576
     networks:
       - servers-network
   node-server:
@@ -48,6 +51,8 @@ services:
       placement:
         max_replicas_per_node: 1
       replicas: 20
+    sysctls:
+      - net.ipv4.ip_local_port_range="14001 65000"
     networks:
       - clients-network
 networks:
