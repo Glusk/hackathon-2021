@@ -2,6 +2,15 @@
 
 [![Node.js CI](https://github.com/Glusk/hackaton-2021/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/Glusk/hackaton-2021/actions/workflows/node.js.yml)
 
+The goal of this hackathon was to setup a test where 1M Charge Points connect to
+the high availability Central System using the emulator provided in this repository.
+
+Hackathon requirements:
+
+- use of Docker,
+- [SSL offloading](https://en.wikipedia.org/wiki/TLS_termination_proxy),
+- maximum latency of 250ms (on average).
+
 ## Install
 
 1. Download [Node.js](https://nodejs.org/en/download/).
