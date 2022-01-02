@@ -36,7 +36,7 @@ function WebSocketClient(cId) {
 WebSocketClient.prototype.open = function wscOpen(url) {
   const that = this;
   this.url = url;
-  this.instance = new WebSocket(URL, ["ocpp1.6"], {
+  this.instance = new WebSocket(this.url, ["ocpp1.6"], {
     handshakeTimeout: OPENING_HANDSHAKE_TIMEOUT_MS,
 
     // If the `rejectUnauthorized` option is not `false`, the server certificate
@@ -45,27 +45,29 @@ WebSocketClient.prototype.open = function wscOpen(url) {
     rejectUnauthorized: false,
   });
 
-  this.instance.on("ping", function wsOnPing() {
+  const thisConnection = this.instance;
+
+  thisConnection.on("ping", () => {
     UTILS.Fn.log(`Client ${that.clientId} received PING`);
 
-    clearTimeout(this.pingTimeout);
+    clearTimeout(that.pingTimeout);
 
     // Use `WebSocket#terminate()`, which immediately destroys the connection,
     // instead of `WebSocket#close()`, which waits for the close timer.
     // Delay should be equal to the interval at which your server
     // sends out pings plus a conservative assumption of the latency.
-    this.pingTimeout = setTimeout(() => {
+    that.pingTimeout = setTimeout(() => {
       UTILS.Fn.log(`Client ${that.clientId} disconnected from server`);
-      this.terminate();
+      thisConnection.terminate();
     }, 30000 + 1000);
   });
 
-  this.instance.on("pong", () => {
+  thisConnection.on("pong", () => {
     // this is issued if client sends ping
     UTILS.Fn.lifecyc("Event pong");
   });
 
-  this.instance.on("open", function wsOnOpen() {
+  thisConnection.on("open", () => {
     const bootNotificationRequest = {
       chargeBoxIdentity: CP_ID,
       chargeBoxSerialNumber: CP_ID,
@@ -91,10 +93,10 @@ WebSocketClient.prototype.open = function wscOpen(url) {
       bootNotificationPayload
     );
 
-    this.send(bootNotificationPayload);
+    thisConnection.send(bootNotificationPayload);
   });
 
-  this.instance.on("message", function wsOnMessage(data) {
+  thisConnection.on("message", (data) => {
     UTILS.Fn.data(`Client ${that.clientId} message received`, data);
 
     let msgArr;
@@ -109,18 +111,18 @@ WebSocketClient.prototype.open = function wscOpen(url) {
     if (msgArr[0] === UTILS.OcppCallType.ServerToClient && msgArr[2].interval) {
       // boot notification response
 
-      this.ocppHeartBeatIntervalMs =
+      that.ocppHeartBeatIntervalMs =
         OCPP_HEARTBEAT_INTERVAL_OVERRIDE_MS != null
           ? OCPP_HEARTBEAT_INTERVAL_OVERRIDE_MS
           : msgArr[2].interval * 1000;
 
       UTILS.Fn.lifecyc(
         `Client ${that.clientId} Next interval will be at: ${moment()
-          .add(this.ocppHeartBeatIntervalMs, "ms")
+          .add(that.ocppHeartBeatIntervalMs, "ms")
           .toString()}`
       );
 
-      this.ocppHeartBeatInterval = setInterval(() => {
+      that.ocppHeartBeatInterval = setInterval(() => {
         that.send(
           JSON.stringify([
             UTILS.OcppCallType.ClientToServer,
@@ -129,14 +131,14 @@ WebSocketClient.prototype.open = function wscOpen(url) {
             {},
           ])
         ); // ocpp heartbeat request
-      }, this.ocppHeartBeatIntervalMs);
+      }, that.ocppHeartBeatIntervalMs);
     } else {
       UTILS.Fn.warn("Do not know what to do with following received message");
       console.log(msgArr);
     }
   });
 
-  this.instance.on("close", function wsOnClose(code) {
+  thisConnection.on("close", (code) => {
     switch (
       code // https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1
     ) {
@@ -160,10 +162,10 @@ WebSocketClient.prototype.open = function wscOpen(url) {
         break;
     }
 
-    clearTimeout(this.pingTimeout);
+    clearTimeout(that.pingTimeout);
   });
 
-  this.instance.on("error", (e) => {
+  thisConnection.on("error", (e) => {
     switch (e.code) {
       case "ECONNREFUSED":
         UTILS.Fn.err(
@@ -195,16 +197,16 @@ WebSocketClient.prototype.send = function wscSend(data, option) {
 };
 
 WebSocketClient.prototype.reconnect = function wscReconnect() {
-  const that = this;
   UTILS.Fn.lifecyc(
     `Client ${this.clientId} - WebSocketClient: retry in ${this.autoReconnectInterval}ms`
   );
   this.instance.removeAllListeners();
   clearInterval(this.ocppHeartBeatInterval);
 
-  setTimeout(function reconnect() {
+  const that = this;
+  setTimeout(() => {
     UTILS.Fn.lifecyc(
-      `Client ${this.clientId} - WebSocketClient retry reconnecting...`
+      `Client ${that.clientId} - WebSocketClient retry reconnecting...`
     );
     that.open(that.url);
   }, this.autoReconnectInterval);
