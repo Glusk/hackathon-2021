@@ -110,9 +110,10 @@ WebSocketClient.prototype.open = function wscOpen(url) {
         OCPP_HEARTBEAT_INTERVAL_OVERRIDE_MS || msgArr[2].interval * 1000;
 
       UTILS.Fn.lifecyc(
-        `Client ${that.clientId} Next interval will be at: ${moment()
-          .add(that.ocppHeartBeatIntervalMs, "ms")
-          .toString()}`
+        `Client ${that.clientId} Next interval will be at: ${moment().add(
+          that.ocppHeartBeatIntervalMs,
+          "ms"
+        )}`
       );
 
       that.ocppHeartBeatInterval = setInterval(() => {
