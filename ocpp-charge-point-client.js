@@ -20,12 +20,9 @@ const LOG_LIFECYCLE = process.env.LOG_LIFECYCLE || true; // lifecycle events (co
 UTILS.Logging.EnablePayloadLogging = LOG_PAYLOAD;
 UTILS.Logging.EnableLifecycleLogging = LOG_LIFECYCLE;
 
-let CP_ID;
-let URL;
-let wsc;
-
-function WebSocketClient(cId) {
+function WebSocketClient(cId, chargePointId) {
   this.clientId = cId;
+  this.chargePointId = chargePointId;
   this.pingTimeout = undefined;
   this.autoReconnectInterval = AUTO_RECONNECT_INTERVAL_MS; // ms
   this.ocppMessageCounter = 1; // ocpp communication contract; must increment on each message sent
@@ -69,10 +66,10 @@ WebSocketClient.prototype.open = function wscOpen(url) {
 
   thisConnection.on("open", () => {
     const bootNotificationRequest = {
-      chargeBoxIdentity: CP_ID,
-      chargeBoxSerialNumber: CP_ID,
+      chargeBoxIdentity: that.chargePointId,
+      chargeBoxSerialNumber: that.chargePointId,
       chargePointModel: "ETREL INCH VIRTUAL Charger vOCPP16J",
-      chargePointSerialNumber: CP_ID,
+      chargePointSerialNumber: that.chargePointId,
       chargePointVendor: "Etrel",
       firmwareVersion: "1.0",
       iccid: "",
@@ -175,7 +172,7 @@ WebSocketClient.prototype.open = function wscOpen(url) {
 WebSocketClient.prototype.msgId = function wscMsgId() {
   // msg ID incremented
   this.ocppMessageCounter += 1;
-  const inc = `${CP_ID}_${this.ocppMessageCounter}`;
+  const inc = `${this.chargePointId}_${this.ocppMessageCounter}`;
   return inc;
 };
 
@@ -213,12 +210,11 @@ WebSocketClient.prototype.reconnect = function wscReconnect() {
 
 for (let clientIdx = 0; clientIdx < CONCURRENCY_LEVEL; clientIdx += 1) {
   // build charge point identity - required by protocol
-  CP_ID = `SI-${UTILS.Fn.uuidv4()}`; // required by protocol
-  URL = `${CS_PROTOCOL}://${CS_HOST}:${CS_PORT}/${CP_ID}?cid=${clientIdx}`; // central system url
+  const chargePointId = `SI-${UTILS.Fn.uuidv4()}`; // required by protocol
+  const url = `${CS_PROTOCOL}://${CS_HOST}:${CS_PORT}/${chargePointId}?cid=${clientIdx}`; // central system url
 
-  UTILS.Fn.lifecyc(`Client is trying to connect to: ${URL}`);
+  UTILS.Fn.lifecyc(`Client is trying to connect to: ${url}`);
 
   // create a client
-  wsc = new WebSocketClient(clientIdx);
-  wsc.open(URL);
+  new WebSocketClient(clientIdx, chargePointId).open(url);
 }
