@@ -13,8 +13,8 @@ const CS_HOST = process.env.CS_HOST || "localhost"; // central system host
 const CS_PORT = process.env.CS_PORT || 8080; // port
 const CONCURRENCY_LEVEL = process.env.CONCURRENCY_LEVEL || 1; // one client by default
 
-const LOG_PAYLOAD = process.env.LOG_PAYLOAD || false; // data exchange verbose logging
-const LOG_LIFECYCLE = process.env.LOG_LIFECYCLE || true; // lifecycle events (connect, reconnect, ping/pong)
+const LOG_PAYLOAD = process.env.LOG_PAYLOAD === "true" || false; // data exchange verbose logging
+const LOG_LIFECYCLE = process.env.LOG_LIFECYCLE === "true" || true; // lifecycle events (connect, reconnect, ping/pong)
 
 // setup logging library
 UTILS.Logging.EnablePayloadLogging = LOG_PAYLOAD;

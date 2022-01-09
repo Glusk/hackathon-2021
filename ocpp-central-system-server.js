@@ -13,8 +13,8 @@ const wsServer = new WebSocket.Server( // represents websocket server
 const WEB_SRV_HOST = process.env.WEB_SRV_HOST || "0.0.0.0"; // interface to bind to (could be only one)
 const WEB_SRV_PORT = process.env.WEB_SRV_PORT || 8080; // port on bind interface
 const HEARTBEAT_INT_MS = process.env.HEARTBEAT_INT_MS || 30000; // the interval at which we check client connectivity
-const LOG_PAYLOAD = process.env.LOG_PAYLOAD || false; // data exchange verbose logging
-const LOG_LIFECYCLE = process.env.LOG_LIFECYCLE || true; // lifecycle events (connect, reconnect, ping/pong)
+const LOG_PAYLOAD = process.env.LOG_PAYLOAD === "true" || false; // data exchange verbose logging
+const LOG_LIFECYCLE = process.env.LOG_LIFECYCLE === "true" || true; // lifecycle events (connect, reconnect, ping/pong)
 
 // setup logging library
 UTILS.Logging.EnablePayloadLogging = LOG_PAYLOAD;
