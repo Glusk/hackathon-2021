@@ -13,19 +13,16 @@ const CS_HOST = process.env.CS_HOST || "localhost"; // central system host
 const CS_PORT = process.env.CS_PORT || 8080; // port
 const CONCURRENCY_LEVEL = process.env.CONCURRENCY_LEVEL || 1; // one client by default
 
-const LOG_PAYLOAD = process.env.LOG_PAYLOAD || false; // data exchange verbose logging
-const LOG_LIFECYCLE = process.env.LOG_LIFECYCLE || true; // lifecycle events (connect, reconnect, ping/pong)
+const LOG_PAYLOAD = process.env.LOG_PAYLOAD === "true" || false; // data exchange verbose logging
+const LOG_LIFECYCLE = process.env.LOG_LIFECYCLE === "true" || true; // lifecycle events (connect, reconnect, ping/pong)
 
 // setup logging library
 UTILS.Logging.EnablePayloadLogging = LOG_PAYLOAD;
 UTILS.Logging.EnableLifecycleLogging = LOG_LIFECYCLE;
 
-let CP_ID;
-let URL;
-let wsc;
-
-function WebSocketClient(cId) {
+function WebSocketClient(cId, chargePointId) {
   this.clientId = cId;
+  this.chargePointId = chargePointId;
   this.pingTimeout = undefined;
   this.autoReconnectInterval = AUTO_RECONNECT_INTERVAL_MS; // ms
   this.ocppMessageCounter = 1; // ocpp communication contract; must increment on each message sent
@@ -69,10 +66,10 @@ WebSocketClient.prototype.open = function wscOpen(url) {
 
   thisConnection.on("open", () => {
     const bootNotificationRequest = {
-      chargeBoxIdentity: CP_ID,
-      chargeBoxSerialNumber: CP_ID,
+      chargeBoxIdentity: that.chargePointId,
+      chargeBoxSerialNumber: that.chargePointId,
       chargePointModel: "ETREL INCH VIRTUAL Charger vOCPP16J",
-      chargePointSerialNumber: CP_ID,
+      chargePointSerialNumber: that.chargePointId,
       chargePointVendor: "Etrel",
       firmwareVersion: "1.0",
       iccid: "",
@@ -81,19 +78,14 @@ WebSocketClient.prototype.open = function wscOpen(url) {
       meterType: "",
     };
 
-    const bootNotificationPayload = JSON.stringify([
+    const bootNotificationPayload = [
       UTILS.OcppCallType.ClientToServer,
       that.msgId(),
       "BootNotification",
       bootNotificationRequest,
-    ]);
+    ];
 
-    UTILS.Fn.data(
-      `Client ${that.clientId} sending boot notification`,
-      bootNotificationPayload
-    );
-
-    thisConnection.send(bootNotificationPayload);
+    that.send(bootNotificationPayload);
   });
 
   thisConnection.on("message", (data) => {
@@ -112,25 +104,22 @@ WebSocketClient.prototype.open = function wscOpen(url) {
       // boot notification response
 
       that.ocppHeartBeatIntervalMs =
-        OCPP_HEARTBEAT_INTERVAL_OVERRIDE_MS != null
-          ? OCPP_HEARTBEAT_INTERVAL_OVERRIDE_MS
-          : msgArr[2].interval * 1000;
+        OCPP_HEARTBEAT_INTERVAL_OVERRIDE_MS || msgArr[2].interval * 1000;
 
       UTILS.Fn.lifecyc(
-        `Client ${that.clientId} Next interval will be at: ${moment()
-          .add(that.ocppHeartBeatIntervalMs, "ms")
-          .toString()}`
+        `Client ${that.clientId} Next interval will be at: ${moment().add(
+          that.ocppHeartBeatIntervalMs,
+          "ms"
+        )}`
       );
 
       that.ocppHeartBeatInterval = setInterval(() => {
-        that.send(
-          JSON.stringify([
-            UTILS.OcppCallType.ClientToServer,
-            that.msgId(),
-            "Heartbeat",
-            {},
-          ])
-        ); // ocpp heartbeat request
+        that.send([
+          UTILS.OcppCallType.ClientToServer,
+          that.msgId(),
+          "Heartbeat",
+          {},
+        ]); // ocpp heartbeat request
       }, that.ocppHeartBeatIntervalMs);
     } else {
       UTILS.Fn.warn("Do not know what to do with following received message");
@@ -183,14 +172,19 @@ WebSocketClient.prototype.open = function wscOpen(url) {
 WebSocketClient.prototype.msgId = function wscMsgId() {
   // msg ID incremented
   this.ocppMessageCounter += 1;
-  const inc = `${CP_ID}_${this.ocppMessageCounter}`;
+  const inc = `${this.chargePointId}_${this.ocppMessageCounter}`;
   return inc;
 };
 
 WebSocketClient.prototype.send = function wscSend(data, option) {
   try {
-    UTILS.Fn.data(`Client ${this.clientId} sending data to CS: `, data);
-    this.instance.send(data, option);
+    const message = data[2];
+    const dataAsString = JSON.stringify(data);
+    UTILS.Fn.data(
+      `Client ${this.clientId} sending ${message} to CS: `,
+      dataAsString
+    );
+    this.instance.send(dataAsString, option);
   } catch (e) {
     this.instance.emit("error", e);
   }
@@ -216,12 +210,11 @@ WebSocketClient.prototype.reconnect = function wscReconnect() {
 
 for (let clientIdx = 0; clientIdx < CONCURRENCY_LEVEL; clientIdx += 1) {
   // build charge point identity - required by protocol
-  CP_ID = `SI-${UTILS.Fn.uuidv4()}`; // required by protocol
-  URL = `${CS_PROTOCOL}://${CS_HOST}:${CS_PORT}/${CP_ID}?cid=${clientIdx}`; // central system url
+  const chargePointId = `SI-${UTILS.Fn.uuidv4()}`; // required by protocol
+  const url = `${CS_PROTOCOL}://${CS_HOST}:${CS_PORT}/${chargePointId}?cid=${clientIdx}`; // central system url
 
-  UTILS.Fn.lifecyc(`Client is trying to connect to: ${URL}`);
+  UTILS.Fn.lifecyc(`Client is trying to connect to: ${url}`);
 
   // create a client
-  wsc = new WebSocketClient(clientIdx);
-  wsc.open(URL);
+  new WebSocketClient(clientIdx, chargePointId).open(url);
 }
