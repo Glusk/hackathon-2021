@@ -81,19 +81,14 @@ WebSocketClient.prototype.open = function wscOpen(url) {
       meterType: "",
     };
 
-    const bootNotificationPayload = JSON.stringify([
+    const bootNotificationPayload = [
       UTILS.OcppCallType.ClientToServer,
       that.msgId(),
       "BootNotification",
       bootNotificationRequest,
-    ]);
+    ];
 
-    UTILS.Fn.data(
-      `Client ${that.clientId} sending boot notification`,
-      bootNotificationPayload
-    );
-
-    thisConnection.send(bootNotificationPayload);
+    that.send(bootNotificationPayload);
   });
 
   thisConnection.on("message", (data) => {
@@ -123,14 +118,12 @@ WebSocketClient.prototype.open = function wscOpen(url) {
       );
 
       that.ocppHeartBeatInterval = setInterval(() => {
-        that.send(
-          JSON.stringify([
-            UTILS.OcppCallType.ClientToServer,
-            that.msgId(),
-            "Heartbeat",
-            {},
-          ])
-        ); // ocpp heartbeat request
+        that.send([
+          UTILS.OcppCallType.ClientToServer,
+          that.msgId(),
+          "Heartbeat",
+          {},
+        ]); // ocpp heartbeat request
       }, that.ocppHeartBeatIntervalMs);
     } else {
       UTILS.Fn.warn("Do not know what to do with following received message");
@@ -189,8 +182,13 @@ WebSocketClient.prototype.msgId = function wscMsgId() {
 
 WebSocketClient.prototype.send = function wscSend(data, option) {
   try {
-    UTILS.Fn.data(`Client ${this.clientId} sending data to CS: `, data);
-    this.instance.send(data, option);
+    const message = data[2];
+    const dataAsString = JSON.stringify(data);
+    UTILS.Fn.data(
+      `Client ${this.clientId} sending ${message} to CS: `,
+      dataAsString
+    );
+    this.instance.send(dataAsString, option);
   } catch (e) {
     this.instance.emit("error", e);
   }
