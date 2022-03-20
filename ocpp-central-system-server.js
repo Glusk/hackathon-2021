@@ -4,6 +4,9 @@ const url = require("url");
 const moment = require("moment");
 const UTILS = require("./utils.js");
 
+console.log = function() {}
+console.error = function() {}
+
 const server = http.createServer();
 const wsServer = new WebSocket.Server( // represents websocket server
   { noServer: true } // issue manual upgrade
