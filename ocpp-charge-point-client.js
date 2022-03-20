@@ -2,8 +2,8 @@ const WebSocket = require("ws");
 const moment = require("moment");
 const UTILS = require("./utils.js");
 
-console.log = function() {}
-console.error = function() {}
+console.log = () => {};
+console.error = () => {};
 
 // Connection settings
 const OPENING_HANDSHAKE_TIMEOUT_MS = 120 * 1000; // wait time for protocol upgrade call

@@ -1,5 +1,5 @@
-console.log = function() {}
-console.error = function() {}
+console.log = () => {};
+console.error = () => {};
 
 const UTILS = {
   Fn: {

@@ -4,8 +4,8 @@ const url = require("url");
 const moment = require("moment");
 const UTILS = require("./utils.js");
 
-console.log = function() {}
-console.error = function() {}
+console.log = () => {};
+console.error = () => {};
 
 const server = http.createServer();
 const wsServer = new WebSocket.Server( // represents websocket server
